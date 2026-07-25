@@ -68,4 +68,4 @@ full corpus). Rationale:
 - **Two algorithms:** BPE (bottom-up greedy merging) and **Unigram LM** (top-down probabilistic pruning). Unigram is SP's signature and tends to give cleaner splits for morphologically rich / inflected languages like Sanskrit.
 - **No pre-tokenization needed:** treats whitespace as a normal symbol (`▁`), making it language-agnostic and well suited to no-space or sandhi-heavy text.
 - **Used by:** T5, LLaMA, ALBERT, and most modern multilingual models.
-- **`character_coverage`:** set below 1.0 (e.g. 0.9995) so rare characters don't blow up the vocab — important for Devanagari with its accent marks and rare conjuncts.
+- **`character_coverage`:** set below 1.0 (e.g. 0.9995) so rare characters don't blow up the vocab — important for Devanagari with its accent marks and rare conjuncts. 
