@@ -12,6 +12,7 @@ def get_stats(ids):
     return counts
 
 
+
 def merge(ids, pair, idx):
     """Replace every occurrence of `pair` with new token `idx`."""
     newids = []
@@ -98,7 +99,7 @@ class BPETokenizer:
 
 
 if __name__ == "__main__":
-    with open("data/shlok_corpus_full.txt", "r", encoding="utf-8") as f:
+    with open("data/corpus/shlok_corpus.txt", "r", encoding="utf-8") as f:
         corpus = f.read()
 
     print("corpus chars:", len(corpus))

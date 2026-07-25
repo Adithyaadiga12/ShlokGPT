@@ -5,7 +5,7 @@ from tokenizer import BPETokenizer
 VOCAB_SIZE = 1000
 
 # ---------- load corpus ----------
-with open("data/shlok_corpus_full.txt", "r", encoding="utf-8") as f:
+with open("data/corpus/shlok_corpus.txt", "r", encoding="utf-8") as f:
     corpus = f.read()
 
 sample = corpus[:300_000]   # slice so OURS (pure python) finishes fast

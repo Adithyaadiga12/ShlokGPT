@@ -1,0 +1,11 @@
+# The large built datasets are stored via Git LFS so they can be committed
+# without hitting GitHub's 100 MB/file limit. Requires once: git lfs install
+# (Prefer no LFS? Add data/corpus/ and data/rag/verses.json to .gitignore and
+#  rebuild locally with `python scripts/build_all.py`.)
+data/corpus/shlok_corpus.txt   filter=lfs diff=lfs merge=lfs -text
+data/corpus/train.txt          filter=lfs diff=lfs merge=lfs -text
+data/corpus/val.txt            filter=lfs diff=lfs merge=lfs -text
+data/rag/verses.jsonl          filter=lfs diff=lfs merge=lfs -text
+
+# The small supporting files stay as normal, diff-able text:
+#   data/rag/sources.json, entities.json, glossary.json, data/eval/queries.json
