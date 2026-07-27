@@ -17,14 +17,14 @@ from model import GPT, GPTConfig
 DATA_DIR = os.environ.get("DATA_DIR", r"C:\Adithya\ShlokGPT\data\corpus")
 OUT_DIR  = os.environ.get("OUT_DIR",  r"C:\Adithya\ShlokGPT\out")
 
-# model (~12M params at vocab 4000)
-block_size, n_layer, n_head, n_embd, dropout = 256, 6, 6, 384, 0.1
-vocab_size = 4000
+# model (~50M params at vocab 16000)
+block_size, n_layer, n_head, n_embd, dropout = 256, 8, 10, 640, 0.1
+vocab_size = 16000
 
 # optimisation
 batch_size     = 32
-max_iters      = 20000
-eval_interval  = 500
+max_iters      = 40000
+eval_interval  = 1000
 eval_iters     = 100
 learning_rate  = 6e-4
 min_lr         = 6e-5

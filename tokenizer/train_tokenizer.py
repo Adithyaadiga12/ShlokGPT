@@ -10,11 +10,11 @@ os.makedirs("tokenizer", exist_ok=True)
 spm.SentencePieceTrainer.train(
     input=r"C:\Adithya\ShlokGPT\data\corpus\shlok_corpus.txt",   # adjust path if different
     model_prefix=r"C:\Adithya\ShlokGPT\tokenizer\shlok",
-    vocab_size=4000,
+    vocab_size=16000,
     model_type="unigram",           # unigram > bpe for inflected languages
     character_coverage=0.9995,      # 0.9995 keeps rare Devanagari chars sane
     byte_fallback=True,             # unknown chars -> bytes, never <unk>
-    input_sentence_size=2_000_000,  # cap sentences fed to trainer (speed)
+    input_sentence_size=5_000_000,  # cap sentences fed to trainer (speed)
     shuffle_input_sentence=True,
     max_sentence_length=8192,
     num_threads=8,

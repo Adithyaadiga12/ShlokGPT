@@ -53,16 +53,20 @@ def _iter_itihasa():
 
 
 def _iter_gretil():
-    """GRETIL: IAST HTML -> Devanagari verses, chunked in contiguous blocks."""
-    for fn, sid, name, _skt, _cat in GRETIL_SOURCES:
-        path = os.path.join(RAW, "gretil", fn)
-        if not os.path.exists(path):
+    """GRETIL: EVERY corpustei sa_*.htm (IAST) -> Devanagari verses. Processes the
+    full catalog (not just the curated SOURCES list) to scale the corpus."""
+    import glob
+    paths = sorted(glob.glob(os.path.join(RAW, "gretil", "sa_*.htm")))
+    for path in paths:
+        sid = os.path.basename(path)[:-4]      # filename w/o .htm
+        try:
+            verses = extract_devanagari_verses(open(path, encoding="utf-8").read())
+        except Exception:
             continue
-        raw = open(path, encoding="utf-8").read()
-        verses = extract_devanagari_verses(raw)
         for i, block in enumerate(verses):
             yield f"{sid}-{i // CHUNK_SIZE}", block
-        print(f"  gretil {name:36s} {len(verses):>7,} verses")
+        if verses:
+            print(f"  {sid[:44]:44s} {len(verses):>7,}")
 
 
 def _iter_mbh():
@@ -79,6 +83,54 @@ def _iter_mbh():
         print(f"  mbh book {book:3s} {len(verses):>7,} verses")
 
 
+def _iter_dcs():
+    """Digital Corpus of Sanskrit: '# text' IAST lines from .conllu -> Devanagari."""
+    import glob
+    from common import iast_to_devanagari
+    files = sorted(glob.glob(os.path.join(RAW, "dcs", "**", "*.conllu"), recursive=True))
+    n = 0
+    for k, path in enumerate(files):
+        try:
+            fh = open(path, encoding="utf-8")
+        except Exception:
+            continue
+        for line in fh:
+            if line.startswith("# text = "):
+                iast = line[9:].strip()
+                if not iast:
+                    continue
+                try:
+                    block = clean_devanagari_block(iast_to_devanagari(iast))
+                except Exception:
+                    continue
+                if block:
+                    n += 1
+                    yield f"DCS-{k // 200}", block
+        fh.close()
+    print(f"  DCS {len(files):,} files -> {n:,} raw sentences")
+
+
+def _iter_hf_mono():
+    """HuggingFace chronbmm sanskrit-monolingual-pretraining parquet shards (IAST)."""
+    import glob
+    import pyarrow.parquet as pq
+    from common import iast_to_devanagari
+    for path in sorted(glob.glob(os.path.join(RAW, "hf_mono", "*.parquet"))):
+        rows = pq.read_table(path, columns=["text"]).column("text").to_pylist()
+        n = 0
+        for iast in rows:
+            if not iast or not iast.strip():
+                continue
+            try:
+                block = clean_devanagari_block(iast_to_devanagari(iast))
+            except Exception:
+                continue
+            if block:
+                n += 1
+                yield f"HFM-{n // CHUNK_SIZE}", block
+        print(f"  hf_mono {os.path.basename(path)} -> {n:,}")
+
+
 def build():
     os.makedirs(CORPUS_DIR, exist_ok=True)
     seen = set()         # normalized keys (whitespace-insensitive) for dedup
@@ -92,7 +144,8 @@ def build():
     # (different critical editions of the same works). Itihasa remains in the RAG
     # dataset (build_rag.py), where its value is the aligned English translation.
     for source_iter, label in ((_iter_bg, "BG"),
-                               (_iter_gretil, "GRETIL"), (_iter_mbh, "Mahabharata")):
+                               (_iter_gretil, "GRETIL"), (_iter_mbh, "Mahabharata"),
+                               (_iter_dcs, "DCS"), (_iter_hf_mono, "HF-mono")):
         print(f"[{label}] extracting...")
         n0 = len(kept)
         for chunk_key, block in source_iter():
