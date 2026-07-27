@@ -39,7 +39,11 @@ torch.manual_seed(seed)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 if device == "cuda":
-    dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+    # bf16 only pays off on Ampere+ (compute capability >= 8.0). On Turing
+    # (T4, sm_75) bf16 is emulated AND disables the fast flash-attention kernel,
+    # so float16 is dramatically faster there.
+    use_bf16 = torch.cuda.is_bf16_supported() and torch.cuda.get_device_capability()[0] >= 8
+    dtype = torch.bfloat16 if use_bf16 else torch.float16
     ctx = torch.autocast(device_type="cuda", dtype=dtype)
 else:
     dtype = torch.float32
