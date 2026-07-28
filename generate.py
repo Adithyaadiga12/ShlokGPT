@@ -86,6 +86,20 @@ def main():
         default=40,
     )
 
+    parser.add_argument(
+        "--repetition_penalty",
+        type=float,
+        default=1.3,
+        help="> 1.0 discourages repeating tokens (1.0 = off)",
+    )
+
+    parser.add_argument(
+        "--no_repeat_ngram_size",
+        type=int,
+        default=3,
+        help="hard-ban repeating n-grams of this size (0 = off)",
+    )
+
     args = parser.parse_args()
 
     device = (
@@ -137,6 +151,8 @@ def main():
             max_new_tokens=args.max_new_tokens,
             temperature=args.temperature,
             top_k=args.top_k,
+            repetition_penalty=args.repetition_penalty,
+            no_repeat_ngram_size=args.no_repeat_ngram_size,
         )
 
     ###############################
