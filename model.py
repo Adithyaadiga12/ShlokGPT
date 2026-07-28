@@ -113,11 +113,38 @@ class GPT(nn.Module):
         return logits, None
 
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None,
+                 repetition_penalty=1.0, no_repeat_ngram_size=0):
+        """
+        repetition_penalty > 1.0 down-weights tokens already generated (CTRL-style).
+        no_repeat_ngram_size > 0 hard-bans any n-gram from repeating.
+        """
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -self.cfg.block_size:]
             logits, _ = self(idx_cond)
             logits = logits[:, -1, :] / temperature
+
+            # repetition penalty: push down logits of already-seen tokens
+            if repetition_penalty != 1.0:
+                for b in range(idx.size(0)):
+                    seen = torch.unique(idx[b])
+                    s = logits[b, seen]
+                    logits[b, seen] = torch.where(s > 0, s / repetition_penalty,
+                                                  s * repetition_penalty)
+
+            # no-repeat n-gram: ban tokens that would complete a prior n-gram
+            if no_repeat_ngram_size > 0 and idx.size(1) >= no_repeat_ngram_size:
+                n = no_repeat_ngram_size
+                for b in range(idx.size(0)):
+                    seq = idx[b].tolist()
+                    prefix = tuple(seq[-(n - 1):]) if n > 1 else ()
+                    banned = set()
+                    for i in range(len(seq) - n + 1):
+                        if tuple(seq[i:i + n - 1]) == prefix:
+                            banned.add(seq[i + n - 1])
+                    for tok in banned:
+                        logits[b, tok] = -float("inf")
+
             if top_k is not None:
                 v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
                 logits[logits < v[:, [-1]]] = -float("inf")
