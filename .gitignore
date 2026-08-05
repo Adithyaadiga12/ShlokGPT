@@ -9,3 +9,6 @@ __pycache__/
 # so it's kept OUT of git (avoids GitHub's 100 MB/file limit + LFS hassle).
 # To publish the dataset, use Hugging Face Datasets, not git.
 data/
+
+# RAG generated index (rebuild with build_index.py)
+rag/index/
