@@ -12,3 +12,11 @@ data/
 
 # RAG generated index (rebuild with build_index.py)
 rag/index/
+
+# secrets — never commit
+.env
+
+# large model artifacts (host on Hugging Face, not git)
+*.pt
+hf_upload/
+final_ckpt.pt
