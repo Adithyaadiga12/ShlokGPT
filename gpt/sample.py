@@ -11,8 +11,9 @@ import sentencepiece as spm
 
 from model import GPT, GPTConfig
 
-OUT_DIR  = os.environ.get("OUT_DIR",  r"C:\Adithya\ShlokGPT\out")
-SP_MODEL = os.environ.get("SP_MODEL", r"C:\Adithya\ShlokGPT\tokenizer\shlok.model")
+_ROOT    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root (gpt/..)
+OUT_DIR  = os.environ.get("OUT_DIR",  os.path.join(_ROOT, "out"))
+SP_MODEL = os.environ.get("SP_MODEL", os.path.join(os.path.dirname(os.path.abspath(__file__)), "tokenizer", "shlok.model"))
 PROMPT   = os.environ.get("PROMPT", "")          # empty = start fresh (from <s>)
 
 num_samples    = 3

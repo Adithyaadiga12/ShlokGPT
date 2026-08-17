@@ -14,8 +14,9 @@ import torch
 from model import GPT, GPTConfig
 
 # ---------------- config (edit these) ----------------
-DATA_DIR = os.environ.get("DATA_DIR", r"C:\Adithya\ShlokGPT\data\corpus")
-OUT_DIR  = os.environ.get("OUT_DIR",  r"C:\Adithya\ShlokGPT\out")
+_ROOT    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root (gpt/..)
+DATA_DIR = os.environ.get("DATA_DIR", os.path.join(_ROOT, "dataset", "data", "corpus"))
+OUT_DIR  = os.environ.get("OUT_DIR",  os.path.join(_ROOT, "out"))
 
 # model (~50M params at vocab 16000)
 block_size, n_layer, n_head, n_embd, dropout = 256, 8, 10, 640, 0.1

@@ -9,16 +9,17 @@ import os
 import numpy as np
 import sentencepiece as spm
 
-ROOT  = r"C:\Adithya\ShlokGPT"
-MODEL = ROOT + r"\tokenizer\shlok.model"
+_HERE   = os.path.dirname(os.path.abspath(__file__))                 # gpt/tokenizer
+_CORPUS = os.path.join(os.path.dirname(os.path.dirname(_HERE)), "dataset", "data", "corpus")
+MODEL   = os.path.join(_HERE, "shlok.model")
 
 sp = spm.SentencePieceProcessor(model_file=MODEL)
 
 BATCH = 50_000   # lines per encode call
 
 for split in ["train", "val"]:
-    txt = ROOT + rf"\data\corpus\{split}.txt"
-    out = ROOT + rf"\data\corpus\{split}.bin"
+    txt = os.path.join(_CORPUS, f"{split}.txt")
+    out = os.path.join(_CORPUS, f"{split}.bin")
 
     with open(txt, encoding="utf-8") as f, open(out, "wb") as fout:
         batch = []

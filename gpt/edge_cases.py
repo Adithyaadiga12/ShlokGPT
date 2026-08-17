@@ -2,12 +2,15 @@
 edge_cases.py — probe the trained model across varied / adversarial prompts.
 Loads the checkpoint once, runs a battery of prompts.
 """
+import os
+
 import sentencepiece as spm
 import torch
 from model import GPT, GPTConfig
 
-CKPT = "final_ckpt.pt"
-TOK  = "tokenizer/shlok.model"
+_HERE = os.path.dirname(os.path.abspath(__file__))
+CKPT = os.path.join(_HERE, "final_ckpt.pt")
+TOK  = os.path.join(_HERE, "tokenizer", "shlok.model")
 
 sp = spm.SentencePieceProcessor(); sp.load(TOK)
 ck = torch.load(CKPT, map_location="cpu")

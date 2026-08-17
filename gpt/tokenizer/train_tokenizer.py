@@ -5,11 +5,13 @@ Run once. Produces tokenizer/shlok.model and tokenizer/shlok.vocab
 import os
 import sentencepiece as spm
 
-os.makedirs("tokenizer", exist_ok=True)
+_HERE   = os.path.dirname(os.path.abspath(__file__))                 # gpt/tokenizer
+_CORPUS = os.path.join(os.path.dirname(os.path.dirname(_HERE)),
+                       "dataset", "data", "corpus", "shlok_corpus.txt")
 
 spm.SentencePieceTrainer.train(
-    input=r"C:\Adithya\ShlokGPT\data\corpus\shlok_corpus.txt",   # adjust path if different
-    model_prefix=r"C:\Adithya\ShlokGPT\tokenizer\shlok",
+    input=_CORPUS,
+    model_prefix=os.path.join(_HERE, "shlok"),
     vocab_size=16000,
     model_type="unigram",           # unigram > bpe for inflected languages
     character_coverage=0.9995,      # 0.9995 keeps rare Devanagari chars sane
@@ -23,7 +25,7 @@ spm.SentencePieceTrainer.train(
 )
 
 # ---- sanity check ----
-sp = spm.SentencePieceProcessor(model_file=r"C:\Adithya\ShlokGPT\tokenizer\shlok.model")
+sp = spm.SentencePieceProcessor(model_file=os.path.join(_HERE, "shlok.model"))
 test = "धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः"
 ids = sp.encode(test)
 
